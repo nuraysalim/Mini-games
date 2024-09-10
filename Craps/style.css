@@ -1,0 +1,38 @@
+button {
+    display: block;
+    margin: auto;
+
+    width: 50%;
+    height: 2em;
+
+    background-image: linear-gradient(yellow, orange);
+
+    font-weight: bold;
+}
+
+canvas {
+    display: block;
+    margin: auto;
+}
+
+form {
+    text-align: center;;
+}
+
+#game-history {
+    margin-top: 60px;
+    text-align: center;
+
+    border-style: dashed;
+    background-color: rgb(255, 245, 230);
+}
+
+.win {
+    color: green;
+    font-weight: bold;
+}
+
+.loss {
+    color: red;
+    font-weight: bold;
+}

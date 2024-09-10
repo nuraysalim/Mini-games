@@ -1,0 +1,232 @@
+<html>
+<head>
+<title>Game of craps</title>
+<script>
+    function gameRules() {
+        alert("RULES:\nIf the player throws a 7 or 11 on the first throw, the player wins. If the player throws a 2, 3, or 12, the player loses.\nFor any other result (4, 5, 6, 8, 9, 10), this result is recorded as the player's point and a follow-up throw is required. On follow-up throws, a throw of 7 loses and a throw of the player's point wins. For anything else, the game continues.");
+    }
+
+
+   const cwidth = 400;
+   const cheight = 300;
+
+   const dicex = 50;
+   const dicey = 50;
+   const diceWidth = 100;
+   const diceHeight = 100;
+   
+   const dotRad = 6;
+   let ctx;
+
+   /*
+   Variables used for horizontal/vertical positioning and 
+   changed for each of the two die faces
+   */
+   let dx;
+   let dy;
+   let firstTurn = true;
+   let point;
+
+
+    function throwDice() {
+        let sum;
+
+        //Gives a random number 1 trough 6
+        let ch = 1+Math.floor(6*Math.random());
+        sum = ch;
+        dx = dicex;
+        dy = dicey;
+        drawface(ch);
+
+        //Repeat for the second die
+        ch = 1+Math.floor(6*Math.random());
+        sum += ch;
+        dx = dicex + 150;
+        drawface(ch);
+
+
+        if (firstTurn) {
+            switch(sum) {
+                case 7: 
+                case 11:
+                    document.f.outcome.value = "You win!";
+                    displayResult("wing");
+                    break;
+                case 2:
+                case 3:
+                case 12:
+                    document.f.outcome.value = "You lose!";
+                    displayResult("loss");
+                    break;
+                default:
+                    point = sum;
+                    document.f.pv.value = point;
+                    firstTurn = false;
+                    document.f.stage.value = "Need follow-up throw.";
+                    document.f.outcome.value = "";
+            }
+        } 
+        else {
+            switch(sum) {
+                case point:
+                    document.f.outcome.value = "You win!";
+                    displayResult("win");
+                    document.f.stage.value = "Back to first throw.";
+                    firstTurn = true;
+                    break;
+                case 7:
+                    document.f.outcome.value = "You lose!";
+                    displayResult("loss");
+                    document.f.stage.value = "Back to first throw.";
+                    firstTurn = true;
+            }
+        }
+    }
+
+    function displayResult(result){
+        const gameHistory = document.getElementById("game-history");
+
+        const message = document.createElement("div");
+
+        if (result === "win") {
+            message.textContent = "You won!";
+            message.classList.add("win");
+        } 
+        else if (result === "loss") {
+            message.textContent = "You lost!";
+            message.classList.add("loss");
+        }
+
+        gameHistory.appendChild(message);
+    }
+
+    function drawface(n) {
+        ctx = document.getElementById('canvas').getContext('2d');
+        
+        ctx.lineWidth = 1.5;
+
+        ctx.clearRect(dx, dy, diceWidth, diceHeight);
+        //Draw the outline of the die face
+        ctx.strokeRect(dx, dy, diceWidth, diceHeight);
+
+        let dotx;
+        let doty;
+
+        ctx.fillStyle = "#FF10F8";
+
+        switch(n) {
+            case 1: 
+                draw1(); break;
+            case 2: 
+                draw2(); break;
+            case 3: 
+                draw2(); draw1(); break;
+            case 4: 
+                draw4(); break;
+            case 5:
+                draw4(); draw1(); break;
+            case 6:
+                draw4(); draw2mid(); break;
+        }
+    }
+
+    function draw1(){
+        let dotx;
+        let doty;
+
+        ctx.beginPath();
+
+        //Set the center of this dot to be at the center of the die face horizontally
+        dotx = dx + .5*diceWidth;
+        doty = dy + .5*diceHeight;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function draw2(){
+        let dotx;
+        let doty;
+
+        ctx.beginPath();
+        dotx = dx + 3*dotRad;
+        doty = dy + 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+
+        dotx = dx + diceWidth - 3*dotRad;
+        doty = dy + diceHeight - 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function draw4() {
+        let dotx;
+        let doty;
+
+        ctx.beginPath();
+        dotx = dx + 3*dotRad;
+        doty = dy + 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+
+        dotx = dx + diceWidth - 3*dotRad;
+        doty = dy + diceHeight - 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+        ctx.closePath();
+        ctx.fill(); //Draw two dots
+
+        ctx.beginPath();
+
+        dotx = dx + 3*dotRad;
+        //doty = dicey + diceHeight - 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+
+        dotx = dx + diceWidth - 3*dotRad;
+        doty = dy + 3*dotRad;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function draw2mid(){
+        let dotx;
+        let doty;
+
+        ctx.beginPath();
+        dotx = dx + 3*dotRad;
+        doty = dy + .5*diceHeight;
+
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+
+        dotx = dx + diceWidth - 3*dotRad;
+        //doty = dicey + .5*diceHeight; the same
+        ctx.arc(dotx, doty, dotRad, 0, 2*Math.PI, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+</script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body onload="gameRules()">
+    <canvas id="canvas" width="400" height="300">
+        Your browser doesn't support the HTML5 element canvas.
+    </canvas>
+    <br/>
+    
+    <form name="f">
+        Stage: <input name="stage" value="First Throw" disabled/>
+        Point: <input name="pv" value="" disabled/>
+        Outcome: <input name="outcome" value="" disabled/>
+    </form>
+    <button onClick = "throwDice()";>Trow dice</button>
+
+    <div id="game-history"></div>
+</body>
+</html>

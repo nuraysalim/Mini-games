@@ -13,7 +13,7 @@ Once you have set the desired velocity and angle, click the "FIRE" button to lau
 To restart the game, refresh the page.
 
 ### Screenshots
-![Game 1 Screenshot](path/to/screenshot1.png)
+![Cannon Ball Screenshot](path/to/screenshot1.png)
 > *Description of the screenshot and what it shows.*
 
 ---
@@ -29,7 +29,7 @@ The result—whether you win or lose—will be displayed on the screen.
 To restart the game, refresh the page.
 
 ### Screenshots
-![Game 2 Screenshot](path/to/screenshot2.png)
+![Craps Screenshot](path/to/screenshot2.png)
 > *Description of the screenshot and what it shows.*
 
 ---
@@ -44,7 +44,7 @@ You have three chances to stop the circle in the center of the doughnut.
 To restart the game, refresh the page.
 
 ### Screenshots
-![Game 3 Screenshot](path/to/screenshot3.png)
+![Fill-in the Doughnut Screenshot](path/to/screenshot3.png)
 > *Description of the screenshot and what it shows.*
 
 ---
@@ -60,7 +60,7 @@ Continue until all pairs are matched.
 To restart the game, refresh the page.
 
 ### Screenshots
-![Game 4 Screenshot](path/to/screenshot4.png)
+![K-pop theme memory game Screenshot](screenshots/to/Memory.png)
 > *Description of the screenshot and what it shows.*
 
 
@@ -71,7 +71,7 @@ These mini-games were created by following the step-by-step instructions from th
 **The Essential Guide to HTML5 Using Games to Learn HTML5 and JavaScript** by [Jeanine Meyer]  
 [Apress, 2018]
 
-I want to acknowledge and thank [Jeanine Meyer] for providing clear and helpful instructions in the book, which guided me through the creation of these mini-games.
+I want to acknowledge and thank Jeanine Meyer for providing clear and helpful instructions in the book, which guided me through the creation of these mini-games.
 ---
 
 ## How to Run the Games

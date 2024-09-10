@@ -1,0 +1,235 @@
+<html>
+    <head>
+        <title>Concentration game</title>
+        <style>
+            body, html {
+                height: 100%;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: white;
+            }
+        </style>
+        <script>
+            let ctx;
+            let firstpick = true;
+            let firstcard = -1;
+            let secondcard;
+            let backcolor = "rgb(235, 235, 0)";
+            let tablecolor = "rgb(255, 255, 255)";
+            let deck = [];
+            let firstsx = 30;
+            let firstsy = 50;
+            let margin = 30;
+            let cardwidth = 150;
+            let cardheight = 150;
+            let matched;
+            let starttime;
+            let count = 0;
+            let pairs = [["exo1.jpg", "exo2.jpg"], ["hwasa.jpg", "wheein.jpg"],
+             ["jhope and rm.jpg", "v and suga.jpg"], ["jisoo.jpg", "rose.jpg"],
+              ["minho.jpg", "key.jpg"], ["straykids1.jpg", "straykids2.jpg"]];
+            let flipping;
+
+            function Card(sx, sy, swidth, sheight, img, info) {
+                this.sx = sx;
+                this.sy = sy;
+                this.swidth = swidth;
+                this.sheight = sheight;
+                //Image reference
+                this.img = img;
+                //Indicates matches
+                this.info = info;
+                this.matched = false;
+                this.draw = drawback;
+            }
+
+            function makedeck() {
+                let i;
+                let acard;
+                let bcard;
+                let pica;
+                let picb;
+                let cx = firstsx;
+                let cy = firstsy;
+
+                for (let i = 0; i < pairs.length; i++) {
+                    pica = new Image();
+                    pica.src = pairs[i][0];
+                    acard = new Card(cx, cy, cardwidth, cardheight, pica, i);
+                    deck.push(acard);
+                    
+                    picb = new Image();
+                    picb.src = pairs[i][1];
+
+                    bcard = new Card(cx, cy+cardheight+margin, cardwidth, cardheight, picb, i);
+                    deck.push(bcard);
+
+                    cx = cx + cardwidth + margin;
+                    acard.draw();
+                    bcard.draw();
+                }
+
+            }
+            
+            function shuffle() {
+                let i;
+                let k;
+                //temporary place for the swap
+                let holderinfo;
+                let holderimg;
+                let dl = deck.length;
+                let nt;
+
+                for(nt = 0; nt < 3*dl; nt++) {
+                    i = Math.floor(Math.random()*dl);
+                    k = Math.floor(Math.random()*dl);
+                    //Save the info and img
+                    holderinfo = deck[i].info;
+                    holderimg = deck[i].img;
+                    //Put k's info and img into i
+                    deck[i].info = deck[k].info;
+                    deck[i].img = deck[k].img;
+                    //Set to the original info and img
+                    deck[k].info = holderinfo;
+                    deck[k].img = holderimg;                
+                }
+            }
+
+            function drawback() {
+                ctx.fillStyle = backcolor;
+                ctx.fillRect(this.sx, this.sy, this.swidth, this.sheight)
+            }
+
+            function choose(ev) {
+                let out;
+                let mx;
+                let my;
+
+                // Get the position of the canvas relative to the viewport
+                let rect = canvas1.getBoundingClientRect();
+
+                if(ev.layerX || ev.layerX == 0) {
+                    // Adjust the mouse coordinates to be relative to the canvas
+                    mx = ev.layerX - rect.left;
+                    my = ev.layerY - rect.top;
+                } else if (ev.offsetX || ev.offsetX == 0) {
+                    mx = ev.offsetX;
+                    my = ev.offsetY;
+                }
+
+                for (let i = 0; i < deck.length; i++) {
+                    let card = deck[i];
+                    
+                    //Ignore clicks during flipping back of cards
+                    if(flipping) return;
+
+                    //To avoid checking for clicking on this space
+                    if(card.sx >= 0)
+                    if((mx > card.sx)&&(mx < card.sx + card.swidth)&&
+                        (my > card.sy)&&(my < card.sy + card.sheight)) {
+                       
+                            if (card.matched) return; //Skip already matched cards
+
+                            if(firstpick) {
+                                firstcard = i;
+                                firstpick = false;
+                                ctx.drawImage(card.img, card.sx, card.sy, card.swidth, card.sheight);
+                            } else if (i !== firstcard) {
+                                secondcard = i;
+                                ctx.drawImage(card.img, card.sx, card.sy, card.swidth, card.sheight);
+        
+                                if(card.info == deck[firstcard].info) {
+                                    matched = true;
+                                    card.matched = true;
+                                    deck[firstcard].matched = true;
+
+                                    count++;
+                                    ctx.fillStyle = tablecolor;
+                                    //Erase area where text will be
+                                    ctx.fillRect(10, 400, 1200, 600);
+                                    //Resent to the color for text
+                                    ctx.fillStyle = backcolor;
+                                    ctx.fillText("Number of matches so far: 6/" + String(count), 380, 450);
+        
+                                    if(count >=  deck.length / 2) {
+                                        let now = new Date();
+                                        let nt = Number(now.getTime());
+                                        let seconds = Math.floor(.5 + (nt - starttime) / 1000);
+                                        
+                                        setTimeout(() => {
+                                            ctx.fillStyle = tablecolor;
+                                            //Erase the whole canvas
+                                            ctx.fillRect(0, 0, 1200, 600);
+                                            ctx.fillStyle = backcolor;
+                                            out = "You finished in " + String(seconds) + "secs.";
+                                            ctx.fillText(out, 415, 25);
+                                            ctx.fillText("Reload the page to try again.", 390, 400);
+                                        }, 1000)
+                                    
+                                    }
+                                } else {
+                                        matched = false;   
+                                    }
+
+                                    flipping = true;
+                                    setTimeout(() => {
+                                        flipback();
+                                        flipping = false;
+                                    }, 1000);
+                                    firstpick = true;
+                                }
+                                
+                                break;
+    
+                        }
+                }
+
+            }
+
+                function flipback() {
+                
+
+                    if(!matched) {
+                        deck[firstcard].draw();
+                        deck[secondcard].draw();
+                    } else {
+                        ctx.fillStyle = tablecolor;
+                        ctx.fillRect(deck[secondcard].sx, deck[secondcard].sy, 
+                            deck[secondcard].swidth, deck[secondcard].sheight);
+                        ctx.fillRect(deck[firstcard].sx, deck[firstcard].sy,
+                            deck[firstcard].swidth, deck[firstcard].sheight);
+                        
+
+                        deck[secondcard].sx = -1;
+                        deck[firstcard].sx = -1;
+                    }
+                    firstcard = -1;
+                    secondcard = -1;
+                    matched = false;
+                }
+
+                function init() {
+                    ctx = document.getElementById('canvas').getContext('2d');
+
+                    canvas1 = document.getElementById('canvas');
+                    canvas1.addEventListener('click', choose, false);
+
+                    makedeck();
+                    shuffle();
+                    ctx.font = "bold 20pt sans-serif";
+                    ctx.fillText("Click on two cards to make a match.", 350, 25);
+                    ctx.fillText("Number of matches so far: 6/0", 380, 450);
+
+                    starttime = new Date();
+                    starttime = Number(starttime.getTime());
+                }
+        </script>
+    </head>
+    <body onLoad="init()">
+        <canvas id="canvas" width="1200" height="600">
+            Your browser does not support the HTML5 element canvas.
+        </canvas>
+    </body>
+</html>

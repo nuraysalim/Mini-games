@@ -1,0 +1,260 @@
+<html>
+    <head>
+        <title></title>
+        <style>
+            form {
+                width: 560px;
+                display: block;
+                margin: auto;
+                margin-top: 20px;
+                background-color: brown;
+                padding: 20px;
+                text-align: center;
+                font-style: italic;
+            }
+
+            #form-header {
+                font-weight: bold;
+                font-size: 24px;
+                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; 
+                       
+            }
+            canvas {
+                display: block;
+                margin: auto;
+            }
+        </style>
+        <script>
+            //Values for canvas
+            let cWidth = 600;
+            let cHeight = 310;
+
+            let ctx;
+            let everything = [];
+
+            //Identifier for the timing event
+            let tid;
+            let horVelocity;
+            //Vertical displacement at the start of interval
+            let verticalVel1;
+            //Vertical displacement at the end of interval
+            let verticalVel2;
+
+            let gravity = 2;
+
+            //Location of cannon
+            let cannonx = 0;
+            let cannony = 250;
+            let cannonLength = 100;
+            let cannonHeight = 20;
+
+            //Initial coordinate for the ball
+            let iBallx = 100 + cannonx; 
+            let iBally = cannony + 10;
+
+            //let ballRad = 10;
+
+            //Location of target
+            let targetx = 400;
+            let targety = 105;
+            let targetw = 185;
+            let targeth = 280;
+
+            //Location of the hit target
+            let htargetx = 250;
+            let htargety = 105;
+            let htargetw = 355;
+            let htargeth = 250;
+
+            //Defining constructor function for an object
+            function Ball(sx,sy,rad,stylestring) {
+                this.sx = sx;
+                this.sy = sy;
+                this.rad = rad;
+                this.draw = drawball;
+                this.moveit = moveball;
+                this.fillstyle = stylestring;
+            }
+
+            
+            function drawball() {
+                ctx.fillStyle = this.fillstyle;
+                
+                ctx.beginPath();
+                ctx.arc(this.sx, this.sy, this.rad, 0, Math.PI*2, true);
+                ctx.fill();
+            }
+            
+            function moveball(dx, dy) {
+                this.sx += dx;
+                this.sy += dy;
+            }
+            
+            let cball = new Ball(iBallx, iBally, 10, "rgb(150, 150, 150)");
+
+            function myRectangle(sx, sy, swidth, sheight, stylestring) {
+                this.sx = sx;
+                this.sy = sy;
+                this.swidth = swidth;
+                this.sheight = sheight;
+                this.fillstyle = stylestring;
+
+                this.draw = drawrects;
+            }
+
+            function drawrects() {
+                ctx.fillStyle = this.fillstyle;
+                ctx.fillRect(this.sx, this.sy, this.swidth, this.sheight);
+            }
+
+            function Picture(sx, sy, swidth, sheight, filename) {
+                let imga = new Image();
+                imga.src = filename;
+
+                this.sx = sx;
+                this.sy = sy;
+                this.img = imga;
+                this.swidth = swidth;
+                this.sheight = sheight;
+                this.draw = drawAnImage;
+            }
+
+            function drawAnImage() {
+                ctx.drawImage(this.img, this.sx, this.sy, this.swidth, this.sheight);
+            }
+
+            let target = new Picture(targetx, targety, targetw, targeth, "rock.jpg");
+            let htarget = new Picture(htargetx, htargety, htargetw, htargeth, "hit-rock.png");
+            
+            let cannon = new myRectangle(cannonx, cannony, cannonLength, cannonHeight, "rgb(40, 40, 0)");
+            let ground = new myRectangle(0, 300, 600, 30, "rgb(150, 75, 0)");
+            
+            everything.push([target, false]);
+            let targetindex = 0;
+            everything.push([ground, false]);
+            everything.push([cball, false]);
+            let ballindex = 2;
+            everything.push([cannon, true, 0, cannonx, cannony + cannonHeight * .5]);
+            let cannonindex = 3;
+
+            function init() {
+                ctx = document.getElementById('canvas').getContext('2d');
+                drawall();
+            }
+
+            function fire() {
+                let angle = Number(document.f.ang.value);
+                let outofcannon = Number(document.f.vo.value);
+                let angleradians = angle * Math.PI / 180;
+                
+                horVelocity = outofcannon * Math.cos(angleradians);
+                verticalVel1 = -outofcannon * Math.sin(angleradians);
+
+                //Set information to rotate cannon
+                everything[cannonindex][2] = -angleradians;
+
+                //Set x and y for cball at mouth of what will be rotated cannon 
+                cball.sx = cannonx + cannonLength * Math.cos(angleradians);
+                cball.sy = cannony + cannonHeight * .5 - cannonLength * Math.sin(angleradians);
+                
+                drawall();
+                tid = setInterval(change, 100);
+
+                //So the page does not refresh
+                return false;
+            }
+
+            function drawall() {
+                ctx.clearRect(0, 0, cWidth, cHeight);
+
+                for (let i = 0; i < everything.length; i++) {
+                    let ob = everything[i];
+
+                    if(ob[1]) {
+                        //save original axes
+                        ctx.save();
+                        ctx.translate(ob[3], ob[4]);
+                        ctx.rotate(ob[2]);
+                        ctx.translate(-ob[3], -ob[4]);
+                        ob[0].draw();
+                        ctx.restore();
+                    } else {
+                        ob[0].draw();
+                    }
+                }
+            }
+
+            function change() {
+                let dx = horVelocity;
+                verticalVel2 = verticalVel1 + gravity;
+
+                let dy = (verticalVel1 + verticalVel2) / 2;
+
+                verticalVel1 = verticalVel2;
+                cball.moveit(dx, dy);
+
+                let bx = cball.sx;
+                let by = cball.sy;
+
+                //Is the ball within the target horizontally and vertically
+                if((bx >= target.sx) && (bx <= target.sx + target.swidth) 
+                && (by <= (target.sy + target.sheight))) {
+                    clearInterval(tid);
+                    //remove target and insert htarget
+                    everything.splice(targetindex, 1, [htarget, false]);
+                    everything.splice(ballindex, 1);
+                    drawall();
+                }
+                
+                //Is the ball beyond ground
+                if(by >= ground.sy) {
+                    clearInterval(tid);
+                }
+
+                setTimeout(function() {
+                    location.reload(true);  
+                }, 2000);
+                
+                //Is this redundant or the one on row 195?
+                drawall();
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                let angleInput = document.getElementById('ang');
+                angleInput.addEventListener('input', updateCannon);
+            })
+
+            function updateCannon() {
+                let angle = Number(document.f.ang.value);
+                let angleradians = angle * Math.PI / 180;
+
+                //Update cannon rotation
+                everything[cannonindex][2] = -angleradians;
+
+                //Update ball position
+                cball.sx = cannonx + cannonLength * Math.cos(angleradians);
+                cball.sy = cannony + cannonHeight * .5 - cannonLength * Math.sin(angleradians);
+
+                //Redraw the canvas
+                drawall();
+            }
+        </script>
+    </head>
+    <body onLoad="init();">
+        <canvas id="canvas" width="600" height="310">
+            Your browser does not support the HTML5 element canvas.
+        </canvas>
+        <br>
+        <form name="f" id="f" onSubmit="return fire();">
+            <span id="form-header">
+                Set velocities, angle and fire the cannonball.
+            </span>
+            <br/>
+            Velocity out of cannon <input name="vo" id="vo" value="10" type="number" min="-100" max="100" />
+            <br/>
+            Angle <input name="ang" id="ang" value="0" type="number" min="0" max="80"/> 
+           <br/>
+            <input type="submit" value="FIRE"/>  
+        </form>
+    </body>
+</html>

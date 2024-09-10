@@ -1,0 +1,257 @@
+<html>
+    <head>
+        <title>Bouncing ball</title>
+        <style>
+            form {
+                display:flex;
+                justify-content: center;
+                background-color: rgb(117, 111, 2);
+                width: 350px;
+                padding: 20px;
+            }
+
+            #attempt-counter {
+                display: flex;
+                font-size: 50px;
+                background-color: rgb(253, 253, 245);
+            }
+
+
+            button {
+                background-color: blanchedalmond;
+                font-size: 25px;
+            }
+
+
+            img {
+               visibility: hidden;
+               width: 1px;
+               height: 1px;
+            }
+
+            body, html {
+                height: 100%;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #win-msg {
+                display: none;
+                color: green;
+                font-size: 50px;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: rgba(255, 255, 255, 0.8);
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            #loss-msg {
+                display: none;
+                color: red;
+                font-size: 50px;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: rgba(0, 0, 0, .5);
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            #canvasContainer {
+                position: relative;
+                width: 450px;
+                height: 350px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #canvas {
+                display: block;
+            }
+        </style>
+        <script>
+            //Coordinates and size of the box
+            let boxx = 20;
+            let boxy = 30;
+            let boxwidth = 400;
+            let boxheight = 300;
+
+            let ballrad = 37;
+
+            //Boundaries: right, bottom, left and top
+            let boxboundx = boxwidth + boxx - ballrad;// 350 + 20 - 27 = 343
+            let boxboundy = boxheight + boxy - ballrad;// 250 + 30 - 27 = 253
+            
+            let inboxboundx = boxx + ballrad;// 20 + 27 = 47 
+            let inboxboundy = boxy + ballrad;// 30 + 27 = 57
+
+            let targetX = 218;
+            let targetY = 175.5;
+            let targetRad = 37.5;
+
+            //Start position of the ball
+            let ballx = 20;
+            let bally = 175;
+
+            // Initial horizontal and vertical displacements
+            let ballvx = 12;
+            let ballvy = 2;
+
+            let bkg = new Image();
+            bkg.src = "donut.png";
+            
+            //will be changed by stopcc
+            let stoppedx = ballvx;
+            let stoppedy = ballvy;
+            
+            //
+            let tid;
+            let ctx;
+            let numTries = 3;
+
+            function init(){
+                ctx = document.getElementById('canvas').getContext('2d'); 
+
+                ctx.lineWidth = 15;
+                ctx.fillStyle = "rgb(208,128,70)";
+                moveball();
+
+                tid = setInterval(moveball, 20);
+            }
+
+            function stopcc() {
+                //Stop the timing interval
+                clearInterval(tid);
+                //Save the current position of the ball
+                stoppedx = ballvx;
+                stoppedy = ballvy;
+                //To display the scene - IT CAN BE REDUNDANT - test
+                moveball()
+
+                //Disable the stop button and anable the resume btn
+                document.getElementById('resumeBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                   
+                numTries -= 1;
+                checkLoss();
+                document.getElementById('attempt-counter').innerHTML = "Chances: " + String(numTries);
+             
+                checkWin();
+                return false;
+            }
+
+            function resume() {
+                clearInterval(tid);
+                ballvx = stoppedx;
+                ballvy = stoppedy;
+
+                tid = setInterval(moveball, 20);
+
+                //Disable the resume btn and enable the stop
+                document.getElementById('resumeBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                return false;
+            }
+
+            function moveball() {
+                //Delete everything drawn on the canvas
+                ctx.clearRect(boxx, boxy, boxwidth, boxheight);
+
+                moveandcheck();
+                ctx.drawImage(bkg, 45, 9, 350, 350);
+
+                ctx.beginPath();
+                //Draws the ball
+                ctx.arc(ballx, bally, ballrad, 0, Math.PI*2, true);
+                ctx.strokeStyle = 'black';
+                ctx.fill();
+                //Draws the box
+                ctx.strokeRect(boxx, boxy, boxwidth, boxheight);
+                // Draw the target area
+                ctx.beginPath();
+                ctx.lineWidth = 5;
+                ctx.arc(targetX, targetY, targetRad, 0, Math.PI * 2, true);
+                ctx.strokeStyle = 'rgb(208,128,70)';
+                ctx.stroke();
+            }
+
+            function moveandcheck() {
+                //To set new position of the ball
+                let nballx = ballx + ballvx;
+                let nbally = bally + ballvy;
+
+                // Is the ball beyond the right wall? If so, go the opposite direction
+                if (nballx > boxboundx || nballx < inboxboundx) {
+                    ballvx = -ballvx;
+                    nballx = (nballx > boxboundx) ? boxboundx : inboxboundx;
+                    // Add slight random variation to velocity
+                    ballvx += (Math.random() - 0.5) * 2;
+                }
+                // Check if the ball is beyond left wall
+                if (nbally > boxboundy || nbally < inboxboundy) {
+                    ballvy = -ballvy;
+                    nbally = (nbally > boxboundy) ? boxboundy : inboxboundy;
+                    // Add slight random variation to velocity
+                    ballvy += (Math.random() - 0.5) * 2;
+                }
+
+                ballx = nballx;
+                bally = nbally;
+            }
+
+            function checkWin() {
+                // Check if the ball is within the target area
+                let dx = ballx - targetX;
+                let dy = bally - targetY;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance <= targetRad) {
+                    document.getElementById('win-msg').style.display = 'block'; // Display win message
+                    document.getElementById('loss-msg').style.display = 'none';
+                    document.getElementById('stopBtn').disabled = true;
+                    document.getElementById('resumeBtn').disabled = true;
+                }
+            }
+
+            function checkLoss() {
+                if (numTries === 0) {
+                    document.getElementById('loss-msg').style.display = 'block';
+                    document.getElementById('stopBtn').disabled = true;
+                    document.getElementById('resumeBtn').disabled = true;
+                }
+            }
+        </script>
+    </head>
+    <body onLoad="init();">
+        <div id="canvasContainer">
+            <canvas id="canvas" width="450" height="350">
+                Your browser doesn't support the HTML5 element canvas.
+            </canvas>
+            <div id="win-msg">Congratulations! You won!</div>
+            <div id="loss-msg">Unfortunately, you lost!</div>
+        </div>
+
+        <br>
+        <div id="attempt-counter">Chances: 3</div>
+        <br>
+
+        <form name="f" id="f" onsubmit="return change();">
+            <button id="stopBtn" onClick="return stopcc();">STOP</button>&nbsp;&nbsp;&nbsp;
+            <button id="resumeBtn" onClick="return resume();" disabled>RESUME</button>
+        </form>
+
+        <!--An img tag to cause the donut.png file to be fully 
+        loaded before anything happens.-->
+        <img src="donut.png"/>
+    </body>
+</html>

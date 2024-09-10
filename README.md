@@ -60,7 +60,7 @@ Continue until all pairs are matched.
 To restart the game, refresh the page.
 
 ### Screenshots
-![K-pop theme memory game Screenshot](screenshots/to/Memory.png)
+![K-pop theme memory game Screenshot](screenshots/Memory.png)
 > *Description of the screenshot and what it shows.*
 
 

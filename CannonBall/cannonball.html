@@ -13,6 +13,10 @@
                 font-style: italic;
             }
 
+            input {
+                margin-bottom: 5px;
+            }
+            
             #form-header {
                 font-weight: bold;
                 font-size: 24px;
@@ -250,7 +254,7 @@
                 Set velocities, angle and fire the cannonball.
             </span>
             <br/>
-            Velocity out of cannon <input name="vo" id="vo" value="10" type="number" min="-100" max="100" />
+            Velocity out of cannon <input name="vo" id="vo" value="10" type="number" min="0" max="100" />
             <br/>
             Angle <input name="ang" id="ang" value="0" type="number" min="0" max="80"/> 
            <br/>

@@ -13,8 +13,8 @@ Once you have set the desired velocity and angle, click the "FIRE" button to lau
 To restart the game, refresh the page.
 
 ### Screenshots
-![Cannon Ball Screenshot](path/to/screenshot1.png)
-> *Description of the screenshot and what it shows.*
+![Cannon Ball Screenshot](screenshots/CannonBall.png)
+> *This screenshot shows the end of the Cannon Ball game, where the cannonball successfully hits the target rock.*
 
 ---
 
@@ -29,8 +29,8 @@ The result—whether you win or lose—will be displayed on the screen.
 To restart the game, refresh the page.
 
 ### Screenshots
-![Craps Screenshot](path/to/screenshot2.png)
-> *Description of the screenshot and what it shows.*
+![Craps Screenshot](screenshots/Craps.png)
+> *This image captures the Craps game after several dice rolls.*
 
 ---
 
@@ -44,8 +44,8 @@ You have three chances to stop the circle in the center of the doughnut.
 To restart the game, refresh the page.
 
 ### Screenshots
-![Fill-in the Doughnut Screenshot](path/to/screenshot3.png)
-> *Description of the screenshot and what it shows.*
+![Fill-in the Doughnut Screenshot](screenshots/Fill-inTheDoughnut.png)
+> *This screenshot depicts the beginning of the Fill-in the Doughnut game. The circle is already moving chaotically inside the box, and the player is preparing to use the "STOP" button to align the circle within the doughnut's center.*
 
 ---
 
@@ -61,7 +61,7 @@ To restart the game, refresh the page.
 
 ### Screenshots
 ![K-pop theme memory game Screenshot](screenshots/Memory.png)
-> *Description of the screenshot and what it shows.*
+> *This image shows the start of the K-pop Theme Memory Game, with all cards face down. The player is ready to begin flipping the cards in search of matching pairs from the same K-pop group.*
 
 
 ## Credits
@@ -73,8 +73,3 @@ These mini-games were created by following the step-by-step instructions from th
 
 I want to acknowledge and thank Jeanine Meyer for providing clear and helpful instructions in the book, which guided me through the creation of these mini-games.
 ---
-
-## How to Run the Games
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/your-repository.git
